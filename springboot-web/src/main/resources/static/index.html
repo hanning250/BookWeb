@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书管理系统</title>
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div id="app" v-cloak>
+    <div class="app-shell">
+        <aside class="hero-panel">
+            <p class="eyebrow">Vue + Spring Boot</p>
+            <h1>图书管理系统</h1>
+            <p class="hero-copy">
+                以单页应用方式管理书库，直接调用后端 REST API，覆盖查询、新增、编辑、删除和购书流程。
+            </p>
+            <div class="hero-stats">
+                <article>
+                    <span>总藏书</span>
+                    <strong>{{ books.length }}</strong>
+                </article>
+                <article>
+                    <span>低库存</span>
+                    <strong>{{ lowStockCount }}</strong>
+                </article>
+                <article>
+                    <span>库存总量</span>
+                    <strong>{{ totalStock }}</strong>
+                </article>
+            </div>
+        </aside>
+
+        <main class="workspace">
+            <header class="workspace-header">
+                <div>
+                    <p class="section-label">书库面板</p>
+                    <h2>数据即改即见</h2>
+                </div>
+                <button class="primary-button" type="button" @click="openCreateDialog">
+                    新增图书
+                </button>
+            </header>
+
+            <section class="toolbar-card">
+                <div class="search-field">
+                    <label for="search">按书名搜索</label>
+                    <div class="search-input-row">
+                        <input
+                                id="search"
+                                v-model.trim="searchKeyword"
+                                type="text"
+                                placeholder="输入书名关键字"
+                                @keyup.enter="searchBooks"
+                        >
+                        <button class="ghost-button" type="button" @click="searchBooks">查询</button>
+                        <button class="ghost-button" type="button" @click="resetSearch">重置</button>
+                    </div>
+                </div>
+                <p class="status-text" :class="{ error: Boolean(errorMessage) }">
+                    {{ errorMessage || statusMessage }}
+                </p>
+            </section>
+
+            <section class="table-card">
+                <div class="table-header">
+                    <h3>图书列表</h3>
+                    <span>{{ loading ? '加载中...' : `共 ${books.length} 本` }}</span>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>书名</th>
+                            <th>作者</th>
+                            <th>分类</th>
+                            <th>出版社</th>
+                            <th>价格</th>
+                            <th>库存</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-if="loading">
+                            <td colspan="8" class="empty-cell">正在加载图书数据...</td>
+                        </tr>
+                        <tr v-else-if="books.length === 0">
+                            <td colspan="8" class="empty-cell">当前没有匹配的图书记录</td>
+                        </tr>
+                        <tr v-for="book in books" :key="book.id">
+                            <td>#{{ book.id }}</td>
+                            <td>
+                                <div class="title-cell">
+                                    <strong>{{ book.title }}</strong>
+                                    <small>{{ book.publisher || '未填写出版社' }}</small>
+                                </div>
+                            </td>
+                            <td>{{ book.author || '未填写' }}</td>
+                            <td>{{ book.category || '未分类' }}</td>
+                            <td>{{ book.publisher || '未填写' }}</td>
+                            <td class="price-cell">¥{{ formatPrice(book.price) }}</td>
+                            <td>
+                                <span class="stock-pill" :class="stockLevelClass(book.stock)">
+                                    {{ book.stock ?? 0 }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-row">
+                                    <button class="table-button" type="button" @click="openPurchaseDialog(book)">购买</button>
+                                    <button class="table-button muted" type="button" @click="openEditDialog(book)">编辑</button>
+                                    <button class="table-button danger" type="button" @click="deleteBook(book)">删除</button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="dialog-backdrop" v-if="showBookDialog" @click.self="closeBookDialog">
+        <section class="dialog-card">
+            <header>
+                <p class="section-label">{{ editingBook.id ? '编辑模式' : '新增模式' }}</p>
+                <h3>{{ editingBook.id ? '编辑图书' : '新增图书' }}</h3>
+            </header>
+
+            <form class="dialog-form" @submit.prevent="submitBook">
+                <label>
+                    <span>书名</span>
+                    <input v-model.trim="bookForm.title" type="text" required maxlength="255">
+                </label>
+                <label>
+                    <span>作者</span>
+                    <input v-model.trim="bookForm.author" type="text" required maxlength="255">
+                </label>
+                <div class="dialog-grid">
+                    <label>
+                        <span>分类</span>
+                        <input v-model.trim="bookForm.category" type="text" maxlength="128">
+                    </label>
+                    <label>
+                        <span>出版社</span>
+                        <input v-model.trim="bookForm.publisher" type="text" maxlength="255">
+                    </label>
+                </div>
+                <div class="dialog-grid">
+                    <label>
+                        <span>价格</span>
+                        <input v-model.number="bookForm.price" type="number" min="0" step="0.01" required>
+                    </label>
+                    <label>
+                        <span>库存</span>
+                        <input v-model.number="bookForm.stock" type="number" min="0" step="1" required>
+                    </label>
+                </div>
+
+                <footer class="dialog-actions">
+                    <button class="ghost-button" type="button" @click="closeBookDialog">取消</button>
+                    <button class="primary-button" type="submit" :disabled="submitting">
+                        {{ submitting ? '提交中...' : (editingBook.id ? '保存修改' : '创建图书') }}
+                    </button>
+                </footer>
+            </form>
+        </section>
+    </div>
+
+    <div class="dialog-backdrop" v-if="showPurchaseDialog" @click.self="closePurchaseDialog">
+        <section class="dialog-card compact">
+            <header>
+                <p class="section-label">购买库存</p>
+                <h3>{{ purchaseTarget.title }}</h3>
+            </header>
+
+            <form class="dialog-form" @submit.prevent="submitPurchase">
+                <label>
+                    <span>购买数量</span>
+                    <input v-model.number="purchaseQuantity" type="number" min="1" step="1" required>
+                </label>
+                <p class="stock-hint">当前库存：{{ purchaseTarget.stock ?? 0 }}</p>
+
+                <footer class="dialog-actions">
+                    <button class="ghost-button" type="button" @click="closePurchaseDialog">取消</button>
+                    <button class="primary-button" type="submit" :disabled="submitting">
+                        {{ submitting ? '处理中...' : '确认购买' }}
+                    </button>
+                </footer>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script src="/vendor/vue.global.prod.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

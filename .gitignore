@@ -1,0 +1,29 @@
+# Maven / Java build output
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs and runtime files
+*.log
+logs/
+*.pid
+
+# IntelliJ IDEA local state
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# Environment and local overrides
+.env
+.env.*
+!.env.example
+application-local.properties

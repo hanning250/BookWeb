@@ -1,0 +1,467 @@
+:root {
+    --bg: #f4efe8;
+    --panel: rgba(255, 249, 242, 0.8);
+    --panel-strong: #fffdf8;
+    --line: rgba(97, 62, 37, 0.12);
+    --text: #2f241d;
+    --muted: #7a6558;
+    --accent: #c96b32;
+    --accent-deep: #9e4b1f;
+    --accent-soft: #f4d8c4;
+    --danger: #bb3f3f;
+    --success: #3a7b54;
+    --shadow: 0 24px 60px rgba(80, 48, 28, 0.12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Noto Sans SC", "Microsoft YaHei UI", "PingFang SC", sans-serif;
+    color: var(--text);
+    background:
+            radial-gradient(circle at top left, rgba(221, 143, 87, 0.24), transparent 30%),
+            radial-gradient(circle at right center, rgba(122, 161, 120, 0.18), transparent 22%),
+            linear-gradient(135deg, #efe3d6 0%, #f7f3ed 42%, #ede5dc 100%);
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+            linear-gradient(rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+    background-size: 36px 36px;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 88%);
+    pointer-events: none;
+}
+
+.app-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px;
+}
+
+.hero-panel,
+.toolbar-card,
+.table-card,
+.dialog-card {
+    backdrop-filter: blur(18px);
+    background: var(--panel);
+    border: 1px solid rgba(255, 255, 255, 0.56);
+    box-shadow: var(--shadow);
+}
+
+.hero-panel {
+    position: sticky;
+    top: 24px;
+    align-self: start;
+    min-height: calc(100vh - 48px);
+    padding: 36px 30px;
+    border-radius: 28px;
+    overflow: hidden;
+}
+
+.hero-panel::after {
+    content: "";
+    position: absolute;
+    inset: auto -40px -60px auto;
+    width: 180px;
+    height: 180px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(201, 107, 50, 0.22), rgba(70, 114, 80, 0.12));
+    filter: blur(4px);
+}
+
+.eyebrow,
+.section-label {
+    margin: 0 0 10px;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+}
+
+.hero-panel h1,
+.workspace-header h2,
+.dialog-card h3,
+.table-header h3 {
+    margin: 0;
+    font-family: "Georgia", "Songti SC", serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.hero-panel h1 {
+    font-size: clamp(2.3rem, 4vw, 4rem);
+    line-height: 1.04;
+    max-width: 6ch;
+}
+
+.hero-copy {
+    margin: 18px 0 32px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.8;
+    max-width: 24rem;
+}
+
+.hero-stats {
+    display: grid;
+    gap: 14px;
+}
+
+.hero-stats article {
+    padding: 18px 20px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.78);
+    animation: rise-in 420ms ease both;
+}
+
+.hero-stats span,
+.table-header span,
+.status-text,
+.stock-hint,
+.title-cell small {
+    color: var(--muted);
+}
+
+.hero-stats strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 2rem;
+}
+
+.workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.workspace-header,
+.toolbar-card,
+.table-header,
+.dialog-actions,
+.action-row,
+.search-input-row {
+    display: flex;
+    align-items: center;
+}
+
+.workspace-header,
+.table-header {
+    justify-content: space-between;
+}
+
+.toolbar-card,
+.table-card {
+    border-radius: 28px;
+}
+
+.toolbar-card {
+    gap: 18px;
+    justify-content: space-between;
+    padding: 20px 22px;
+}
+
+.search-field {
+    flex: 1;
+}
+
+.search-field label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.search-input-row {
+    gap: 10px;
+}
+
+.search-input-row input,
+.dialog-form input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.84);
+    color: var(--text);
+    outline: none;
+    transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.search-input-row input:focus,
+.dialog-form input:focus {
+    border-color: rgba(201, 107, 50, 0.56);
+    box-shadow: 0 0 0 4px rgba(201, 107, 50, 0.14);
+    transform: translateY(-1px);
+}
+
+button {
+    font: inherit;
+}
+
+.primary-button,
+.ghost-button,
+.table-button {
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.primary-button,
+.ghost-button {
+    padding: 13px 20px;
+}
+
+.primary-button {
+    color: #fff9f3;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    box-shadow: 0 12px 24px rgba(158, 75, 31, 0.24);
+}
+
+.ghost-button {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.62);
+}
+
+.table-button {
+    padding: 9px 14px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.table-button.muted {
+    background: rgba(105, 118, 135, 0.14);
+}
+
+.table-button.danger {
+    color: #fff3f3;
+    background: var(--danger);
+}
+
+.primary-button:hover,
+.ghost-button:hover,
+.table-button:hover {
+    transform: translateY(-1px);
+}
+
+.primary-button:disabled,
+.ghost-button:disabled {
+    cursor: wait;
+    opacity: 0.75;
+    transform: none;
+}
+
+.status-text {
+    min-width: 200px;
+    font-size: 14px;
+    text-align: right;
+}
+
+.status-text.error {
+    color: var(--danger);
+}
+
+.table-card {
+    padding: 18px 18px 10px;
+}
+
+.table-wrap {
+    overflow: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+}
+
+th,
+td {
+    padding: 18px 14px;
+    text-align: left;
+    border-top: 1px solid rgba(97, 62, 37, 0.08);
+}
+
+thead th {
+    border-top: none;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+tbody tr {
+    transition: background 180ms ease, transform 180ms ease;
+}
+
+tbody tr:hover {
+    background: rgba(255, 255, 255, 0.54);
+}
+
+.empty-cell {
+    padding: 42px 16px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.title-cell {
+    display: grid;
+    gap: 4px;
+}
+
+.price-cell {
+    font-weight: 700;
+    color: var(--accent-deep);
+}
+
+.stock-pill {
+    display: inline-flex;
+    min-width: 52px;
+    justify-content: center;
+    padding: 8px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.stock-pill.high {
+    color: #205a3c;
+    background: rgba(58, 123, 84, 0.16);
+}
+
+.stock-pill.low {
+    color: #8e5b12;
+    background: rgba(232, 183, 75, 0.22);
+}
+
+.stock-pill.out {
+    color: #7f2424;
+    background: rgba(187, 63, 63, 0.18);
+}
+
+.action-row {
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.dialog-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(39, 24, 14, 0.35);
+    animation: fade-in 180ms ease;
+}
+
+.dialog-card {
+    width: min(640px, 100%);
+    padding: 28px;
+    border-radius: 28px;
+    background: var(--panel-strong);
+}
+
+.dialog-card.compact {
+    width: min(420px, 100%);
+}
+
+.dialog-form {
+    display: grid;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.dialog-form label span {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.dialog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.dialog-actions {
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 1100px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-panel {
+        position: relative;
+        top: 0;
+        min-height: auto;
+    }
+}
+
+@media (max-width: 760px) {
+    .app-shell {
+        padding: 14px;
+    }
+
+    .hero-panel,
+    .toolbar-card,
+    .table-card,
+    .dialog-card {
+        border-radius: 22px;
+    }
+
+    .workspace-header,
+    .toolbar-card,
+    .search-input-row,
+    .dialog-grid,
+    .dialog-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .status-text {
+        min-width: 0;
+        text-align: left;
+    }
+}
